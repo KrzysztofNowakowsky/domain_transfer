@@ -1,0 +1,51 @@
+# Konfiguracja: Los Llanos de Aridane (Wyspy Kanaryjskie) - 10 cm/piksel
+
+# Dane wejściowe
+orthophotos:
+  - "data/los_llanos/orthophoto_train_2024_10cm.tif"
+  - "data/los_llanos/orthophoto_val_2024_10cm.tif"
+  - "data/los_llanos/orthophoto_test_2024_10cm.tif"
+
+# Deterministyczny podział na rozłączne obszary
+splits:
+  "data/los_llanos/orthophoto_train_2024_10cm.tif": "train"
+  "data/los_llanos/orthophoto_val_2024_10cm.tif": "val"
+  "data/los_llanos/orthophoto_test_2024_10cm.tif": "test"
+
+buildings_vector: "data/los_llanos/buildings_los_llanos_2026.gpkg"
+buildings_layer: "buildings"
+
+# Katalog wyjściowy
+output_dir: "outputs/los_llanos_10cm_ft15"
+splits_csv: "outputs/los_llanos_10cm/splits.csv"   # te same kafle
+
+# Parametry rastra i kafelkowania
+bands: [1, 2, 3]
+tile_size: 512
+stride: 512
+min_building_pixels: 12
+mask_erosion_m: 0.0
+all_touched: false
+
+random_seed: 42
+
+# Fine-tuning na Los Llanos (start z wag PL, pełne 15 epok — porównanie przy równym budżecie)
+training:
+  init_checkpoint: "outputs/poland_10cm/checkpoints/best.pt"
+  epochs: 15
+  batch_size: 8
+  learning_rate: 0.0001
+  weight_decay: 0.0001
+  num_workers: 0
+  amp: false
+  patience: 15   # bez early stopping: ten sam budżet 15 epok co trening kontrolny
+  threshold: 0.5
+  encoder_name: "resnet34"
+  encoder_weights: "imagenet"
+
+# Predykcja i wektoryzacja
+prediction:
+  threshold: 0.5
+  batch_size: 8
+  min_polygon_area_m2: 4.0
+  simplify_tolerance_m: 0.10

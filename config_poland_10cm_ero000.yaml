@@ -1,0 +1,46 @@
+# Eksperyment M.2: baseline bez erozji, trenowany tym samym protokołem (15 epok) co warianty z erozją
+
+# Dane wejściowe
+orthophotos:
+  - "data/poland/orthophoto_skawina_north_10cm.tif"
+  - "data/poland/orthophoto_skawina_south_10cm.tif"
+
+buildings_vector: "data/poland/buildings_bdot10k_skawina.gpkg"
+buildings_layer: "buildings"
+
+# Katalog wyjściowy
+output_dir: "outputs/poland_10cm_ero000"
+splits_csv: "outputs/poland_10cm/splits.csv"   # te same kafle i maski co baseline
+
+# Parametry rastra i kafelkowania
+bands: [1, 2, 3]
+tile_size: 512
+stride: 512
+min_building_pixels: 12
+mask_erosion_m: 0.0
+all_touched: false
+
+# Podział przestrzenny (bloki 4x4 kafli, rozłączne geograficznie)
+validation_fraction: 0.15
+test_fraction: 0.15
+random_seed: 42
+
+# Trenowanie
+training:
+  epochs: 15
+  batch_size: 8
+  learning_rate: 0.0003
+  weight_decay: 0.0001
+  num_workers: 0
+  amp: false
+  patience: 8
+  threshold: 0.5
+  encoder_name: "resnet34"
+  encoder_weights: "imagenet"
+
+# Predykcja i wektoryzacja
+prediction:
+  threshold: 0.5
+  batch_size: 8
+  min_polygon_area_m2: 4.0
+  simplify_tolerance_m: 0.10
